@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AuthService;
+use App\Services\userService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    protected $authService;
+    protected $userService;
 
-    public function __construct(AuthService $authService)
+    public function __construct(userService $userService)
     {
-        $this->authService = $authService;
+        $this->userService = $userService;
     }
     /**
      * Register a new user
@@ -25,7 +25,7 @@ class AuthController extends Controller
         $data = $request->only(['name', 'email', 'password', 'password_confirmation']);
 
         try {
-            $response = $this->authService->register($data);
+            $response = $this->userService->register($data);
             return response()->json($response, 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -42,7 +42,7 @@ class AuthController extends Controller
         $data = $request->only(['email', 'password']);
 
         try {
-            $response = $this->authService->login($data);
+            $response = $this->userService->login($data);
             return response()->json($response, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -59,7 +59,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         try {
-            $this->authService->logout($user);
+            $this->userService->logout($user);
             return response()->json(['message' => 'Successfully logged out'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -123,7 +123,7 @@ class AuthController extends Controller
     public function getAllUsers(): JsonResponse
     {
         try {
-            $users = $this->authService->getAllUsers();
+            $users = $this->userService->getAllUsers();
             return response()->json($users, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -140,7 +140,7 @@ class AuthController extends Controller
     public function findUserById(int $id): JsonResponse
     {
         try {
-            $user = $this->authService->findUserById($id);
+            $user = $this->userService->findUserById($id);
             return response()->json($user, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -157,7 +157,7 @@ class AuthController extends Controller
     public function findUserByEmail(string $email): JsonResponse
     {
         try {
-            $user = $this->authService->findUserByEmail($email);
+            $user = $this->userService->findUserByEmail($email);
             return response()->json($user, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 422);
