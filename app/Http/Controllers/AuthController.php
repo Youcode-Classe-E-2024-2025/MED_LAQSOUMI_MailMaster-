@@ -2,47 +2,165 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $authService;
+
+    public function __construct(AuthService $authService)
     {
-        //
+        $this->authService = $authService;
+    }
+    /**
+     * Register a new user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $data = $request->only(['name', 'email', 'password', 'password_confirmation']);
+
+        try {
+            $response = $this->authService->register($data);
+            return response()->json($response, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+    /**
+     * Login a user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function login(Request $request): JsonResponse
+    {
+        $data = $request->only(['email', 'password']);
+
+        try {
+            $response = $this->authService->login($data);
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+    /**
+     * Logout a user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        try {
+            $this->authService->logout($user);
+            return response()->json(['message' => 'Successfully logged out'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+    /**
+     * Get the authenticated user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function user(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user) {
+            return response()->json($user, 200);
+        }
+
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+    /**
+     * Refresh the authenticated user's token
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function refreshToken(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json(['token' => $token], 200);
+        }
+
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+    /**
+     * Delete the authenticated user's token
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function deleteToken(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $user->tokens()->delete();
+            return response()->json(['message' => 'Token deleted'], 200);
+        }
+
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+    /**
+     * Get all users
+     *
+     * @return JsonResponse
+     */
+    public function getAllUsers(): JsonResponse
+    {
+        try {
+            $users = $this->authService->getAllUsers();
+            return response()->json($users, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * find a user by ID
+     *
+     * @param int $id
+     * @return JsonResponse
      */
-    public function store(Request $request)
-    {
 
+    public function findUserById(int $id): JsonResponse
+    {
+        try {
+            $user = $this->authService->findUserById($id);
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
     }
 
     /**
-     * Display the specified resource.
+     * find a user by Email
+     *
+     * @param string $email
+     * @return JsonResponse
      */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function findUserByEmail(string $email): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        try {
+            $user = $this->authService->findUserByEmail($email);
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
     }
 }
