@@ -21,25 +21,49 @@ class subscriberService
     }
 
     /**
-     * Register a new subscriber
+     * Subscribe a user
      *
      * @param array $data
      * @return array
-     * @throws ValidationException
      */
-    public function register(array $data): array
+    public function subscribe(array $data)
     {
         $validator = Validator::make($data, [
-            'email' => 'required|string|email|max:255|unique:subscribers',
+            'email' => 'required|email|unique:subscribers,email',
         ]);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
-        $subscriber = $this->subscriberRepository->createSubscriber($data);
+        $subscriber = $this->subscriberRepository->subscribe($data);
 
         return [
+            'message' => 'Subscription successful',
+            'subscriber' => $subscriber,
+        ];
+    }
+
+    /**
+     * Unsubscribe a user
+     *
+     * @param array $data
+     * @return array
+     */
+    public function unsubscribe(array $data)
+    {
+        $validator = Validator::make($data, [
+            'email' => 'required|email|exists:subscribers,email',
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        $subscriber = $this->subscriberRepository->unsubscribe($data['email']);
+
+        return [
+            'message' => 'Unsubscription successful',
             'subscriber' => $subscriber,
         ];
     }
@@ -47,57 +71,38 @@ class subscriberService
     /**
      * Get all subscribers
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return array
      */
+
     public function getAllSubscribers()
     {
-        return $this->subscriberRepository->getAllSubscribers();
+        $subscribers = $this->subscriberRepository->getAllSubscribers();
+
+        return [
+            'subscribers' => $subscribers,
+        ];
     }
-
     /**
-     * Find a subscriber by email
+     * Get a subscriber by email
      *
-     * @param string $email
-     * @return \App\Models\Subscriber|null
-     */
-
-    public function findSubscriberByEmail($email)
-    {
-        return $this->subscriberRepository->findSubscriberByEmail($email);
-    }
-
-
-    /**
-     * Update a subscriber
-     *
-     * @param \App\Models\Subscriber $subscriber
      * @param array $data
-     * @return \App\Models\Subscriber
+     * @return array
      */
-
-    public function updateSubscriber($subscriber, array $data)
+    public function getSubscriberByEmail(array $data)
     {
         $validator = Validator::make($data, [
-            'email' => 'sometimes|required|string|email|max:255|unique:subscribers,email,' . $subscriber->id,
+            'email' => 'required|email|exists:subscribers,email',
         ]);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
-        return $this->subscriberRepository->updateSubscriber($subscriber, $data);
+        $subscriber = $this->subscriberRepository->findSubscriberByEmail($data['email']);
+
+        return [
+            'subscriber' => $subscriber,
+        ];
     }
 
-
-    /**
-     * Delete a subscriber
-     *
-     * @param \App\Models\Subscriber $subscriber
-     * @return bool|null
-     */
-
-    public function deleteSubscriber($subscriber)
-    {
-        return $this->subscriberRepository->deleteSubscriber($subscriber);
-    }
 }

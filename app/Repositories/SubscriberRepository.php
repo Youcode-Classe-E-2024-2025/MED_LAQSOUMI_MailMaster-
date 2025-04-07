@@ -7,6 +7,29 @@ use App\Models\Subscriber;
 class SubscriberRepository
 {
     /**
+     * Subscribe a user.
+     *
+     * @param array $data
+     * @return \App\Models\Subscriber
+     */
+    public function subscribe(array $data)
+    {
+        return Subscriber::create($data);
+    }
+
+    /**
+     * Unsubscribe a user.
+     *
+     * @param \App\Models\Subscriber $subscriber
+     * @return bool|null
+     */
+    public function unsubscribe(Subscriber $subscriber)
+    {
+        return $subscriber->delete();
+    }
+
+
+    /**
      * Get all subscribers.
      *
      * @return \Illuminate\Database\Eloquent\Collection
