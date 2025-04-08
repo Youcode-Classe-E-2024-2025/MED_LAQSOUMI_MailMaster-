@@ -8,9 +8,9 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * @OA\Info(
- *     title="User Authentication API",
+ *     title="MailMaster - API",
  *     version="1.0.0",
- *     description="API for user authentication and management"
+ *     description="API for Mailing management"
  * )
  *
  * @OA\SecurityScheme(

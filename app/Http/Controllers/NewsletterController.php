@@ -5,13 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\NewsletterService;
 
-/**
- * @OA\Info(
- *     title="Newsletter API",
- *     version="1.0.0",
- *     description="API endpoints for managing newsletters"
- * )
- */
 class NewsletterController extends Controller
 {
     protected $newsletterService;
