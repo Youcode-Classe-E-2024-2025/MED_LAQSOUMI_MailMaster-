@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Campaign;
 use App\Models\User;
 use App\Models\Subscriber;
 use App\Models\Newsletter;
@@ -17,5 +18,6 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create();
         Subscriber::factory(10)->create();
         Newsletter::factory(10)->create();
+        Campaign::factory(10)->create();
     }
 }

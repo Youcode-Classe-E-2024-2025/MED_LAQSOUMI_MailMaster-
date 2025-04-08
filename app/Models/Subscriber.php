@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Subscriber extends Model
 {
@@ -21,18 +22,12 @@ class Subscriber extends Model
         'subscribed_at' => 'datetime',
         'unsubscribed_at' => 'datetime',
     ];
-    /**
-     * Get the newsletter that the subscriber belongs to.
-     */
-    public function newsletter()
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+    public function newsletters(): BelongsToMany
     {
-        return $this->belongsTo(Newsletter::class);
+        return $this->belongsToMany(Newsletter::class)->withTimestamps();
     }
-    /**
-     * Get the campaigns that the subscriber has received.
-     */
-    // public function campaigns()
-    // {
-    //     return $this->belongsToMany(Campaign::class)->withTimestamps();
-    // }
 }

@@ -13,13 +13,23 @@ class Newsletter extends Model
 
     protected $fillable = ['name', 'description'];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function subscribers(): BelongsToMany
     {
         return $this->belongsToMany(Subscriber::class)->withTimestamps();
     }
 
-    // public function campaigns(): HasMany
-    // {
-    //     return $this->hasMany(Campaign::class);
-    // }
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
 }

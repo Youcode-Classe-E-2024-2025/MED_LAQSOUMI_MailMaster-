@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Newsletter;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class CampaignFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'newsletter_id' => Newsletter::factory(),
+            'subject' => $this->faker->sentence,
+            'body' => $this->faker->paragraph,
+            'sent_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ];
     }
 }
