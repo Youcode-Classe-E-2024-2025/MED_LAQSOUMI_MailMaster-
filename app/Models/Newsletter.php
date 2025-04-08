@@ -13,10 +13,10 @@ class Newsletter extends Model
 
     protected $fillable = ['name', 'description'];
 
-    // public function subscribers(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(Subscriber::class)->withTimestamps();
-    // }
+    public function subscribers(): BelongsToMany
+    {
+        return $this->belongsToMany(Subscriber::class)->withTimestamps();
+    }
 
     // public function campaigns(): HasMany
     // {
