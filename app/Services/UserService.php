@@ -9,13 +9,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class userService
+class UserService
 {
-    protected $userRepository;
+    protected $UserRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $UserRepository)
     {
-        $this->userRepository = $userRepository;
+        $this->UserRepository = $UserRepository;
     }
     /**
      * Register a new user
@@ -37,7 +37,7 @@ class userService
         }
 
         $data['password'] = Hash::make($data['password']);
-        $user = $this->userRepository->createUser($data);
+        $user = $this->UserRepository->createUser($data);
 
         return [
             'user' => $user,
@@ -118,7 +118,7 @@ class userService
             $data['password'] = Hash::make($data['password']);
         }
 
-        return $this->userRepository->updateUser($user, $data);
+        return $this->UserRepository->updateUser($user, $data);
     }
     /**
      * Delete user account
@@ -128,7 +128,7 @@ class userService
     public function deleteAccount(): void
     {
         $user = Auth::user();
-        $this->userRepository->deleteUser($user);
+        $this->UserRepository->deleteUser($user);
     }
     /**
      * Find user by email
@@ -138,7 +138,7 @@ class userService
      */
     public function findUserByEmail(string $email): ?User
     {
-        return $this->userRepository->findUserByEmail($email);
+        return $this->UserRepository->findUserByEmail($email);
     }
     /**
      * Find user by ID
@@ -148,7 +148,7 @@ class userService
      */
     public function findUserById(int $id): ?User
     {
-        return $this->userRepository->findUserById($id);
+        return $this->UserRepository->findUserById($id);
     }
     /**
      * Get all users
@@ -157,6 +157,6 @@ class userService
      */
     public function getAllUsers()
     {
-        return $this->userRepository->getAllUsers();
+        return $this->UserRepository->getAllUsers();
     }
 }
