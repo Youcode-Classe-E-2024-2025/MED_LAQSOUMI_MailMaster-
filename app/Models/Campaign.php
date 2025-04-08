@@ -16,6 +16,7 @@ class Campaign extends Model
         'sent_at' => 'datetime',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function newsletter(): BelongsTo
     {
