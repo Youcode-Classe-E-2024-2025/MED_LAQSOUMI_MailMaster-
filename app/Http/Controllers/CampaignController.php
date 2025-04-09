@@ -5,12 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Campaign;
 use Illuminate\Http\Request;
 
-/**
- * @OA\Tag(
- *     name="Campaigns",
- *     description="API Endpoints for Campaign Management"
- * )
- */
 class CampaignController extends Controller
 {
     /**
@@ -23,7 +17,18 @@ class CampaignController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
-     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Campaign"))
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="newsletter_id", type="integer"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
      *     )
      * )
      */
@@ -42,21 +47,39 @@ class CampaignController extends Controller
      *     tags={"Campaigns"},
      *     @OA\RequestBody(
      *         required=true,
+     *         description="Campaign data",
      *         @OA\JsonContent(
      *             required={"name", "newsletter_id"},
-     *             @OA\Property(property="name", type="string", example="Spring Sale Campaign"),
-     *             @OA\Property(property="description", type="string", example="Campaign for the spring season sales"),
+     *             @OA\Property(property="name", type="string", example="New Campaign"),
+     *             @OA\Property(property="description", type="string", example="This is a new campaign."),
      *             @OA\Property(property="newsletter_id", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
      *         description="Campaign created successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/Campaign")
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="newsletter_id", type="integer"),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Validation error"
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Validation error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
+     *                 @OA\Property(property="newsletter_id", type="array", @OA\Items(type="string", example="The selected newsletter id is invalid."))
+     *             )
+     *         )
      *     )
      * )
      */
@@ -77,27 +100,43 @@ class CampaignController extends Controller
      * Display the specified resource.
      *
      * @OA\Get(
-     *     path="/api/campaigns/{id}",
-     *     summary="Get a specific campaign by ID",
-     *     tags={"Campaigns"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="Campaign ID",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/Campaign")
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Campaign not found"
-     *     )
+     *    path="/api/campaigns/{id}",
+     *   summary="Get a specific campaign",
+     *   tags={"Campaigns"},
+     *   @OA\Parameter(
+     *        name="id",
+     *       in="path",
+     *       required=true,
+     *      description="The ID of the campaign to retrieve",
+     *      @OA\Schema(
+     *           type="integer",
+     *          example=1
+     *      )
+     *   ),
+     *  @OA\Response(
+     *       response=200,
+     *      description="Campaign retrieved successfully",
+     *      @OA\JsonContent(
+     *           type="object",
+     *          @OA\Property(property="id", type="integer"),
+     *          @OA\Property(property="name", type="string"),
+     *         @OA\Property(property="description", type="string"),
+     *         @OA\Property(property="newsletter_id", type="integer"),
+     *        @OA\Property(property="created_at", type="string", format="date-time"),
+     *       @OA\Property(property="updated_at", type="string", format="date-time")
+     *      )
+     *  ),
+     * @OA\Response(
+     *      response=404,
+     *     description="Campaign not found",
+     *    @OA\JsonContent(
+     *        type="object",
+     *       @OA\Property(property="error", type="string", example="Campaign not found")
+     *      )
+     *   )
      * )
      */
+
     public function show(int $id)
     {
         $campaign = Campaign::findOrFail($id);
@@ -117,34 +156,16 @@ class CampaignController extends Controller
      *         in="path",
      *         required=true,
      *         description="The ID of the campaign to update",
-     *         @OA\Schema(
-     *             type="integer",
-     *             example=1
-     *         )
+     *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Payload to update the campaign",
+     *         description="Updated campaign data",
      *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="name",
-     *                 type="string",
-     *                 description="The name of the campaign",
-     *                 example="New Campaign Name"
-     *             ),
-     *             @OA\Property(
-     *                 property="description",
-     *                 type="string",
-     *                 description="The description of the campaign",
-     *                 example="This is an updated description for the campaign."
-     *             ),
-     *             @OA\Property(
-     *                 property="status",
-     *                 type="string",
-     *                 description="The status of the campaign",
-     *                 example="active"
-     *             )
+     *             required={"name", "newsletter_id"},
+     *             @OA\Property(property="name", type="string", example="Updated Campaign"),
+     *             @OA\Property(property="description", type="string", example="This is an updated campaign."),
+     *             @OA\Property(property="newsletter_id", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -152,42 +173,14 @@ class CampaignController extends Controller
      *         description="Campaign updated successfully",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(
-     *                 property="success",
-     *                 type="boolean",
-     *                 example=true
-     *             ),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 description="Updated campaign details"
-     *             )
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="newsletter_id", type="integer"),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Campaign not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="error",
-     *                 type="string",
-     *                 example="Campaign not found"
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid input data",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="error",
-     *                 type="string",
-     *                 example="Invalid request payload"
-     *             )
-     *         )
-     *     )
      * )
      */
 
@@ -209,10 +202,40 @@ class CampaignController extends Controller
         ]);
     }
 
-
-
     /**
      * Remove the specified resource from storage.
+     *
+     * @OA\Delete(
+     *     path="/api/campaigns/{id}",
+     *     summary="Delete a specific campaign",
+     *     tags={"Campaigns"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="The ID of the campaign to delete",
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=1
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Campaign deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Campaign not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="error",
+     *                 type="string",
+     *                 example="Campaign not found"
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function destroy(int $id)
     {
@@ -222,8 +245,38 @@ class CampaignController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
+        /**
      * Get all campaigns by newsletter ID.
+     *
+     * @OA\Get(
+     *     path="/api/newsletters/{newsletter_id}/campaigns",
+     *     summary="Get campaigns by newsletter ID",
+     *     operationId="getCampaignsByNewsletterId",
+     *     tags={"Campaigns"},
+     *     @OA\Parameter(
+     *         name="newsletter_id",
+     *         in="path",
+     *         required=true,
+     *         description="Newsletter ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="newsletter_id", type="integer"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function getCampaignsByNewsletterId(int $newsletterId)
     {
@@ -233,9 +286,42 @@ class CampaignController extends Controller
     }
 
     /**
-     * Get campaigns by cpmaigns ID.
+     * Get campaign by campaign ID.
+     *
+     * @OA\Get(
+     *     path="/api/campaigns/find/{id}",
+     *     summary="Get campaign by ID (alternative endpoint)",
+     *     operationId="getCampaignsById",
+     *     tags={"Campaigns"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Campaign ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="newsletter_id", type="integer"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Campaign not found"
+     *     )
+     * )
      */
-
     public function getCampaignsById(int $id)
     {
         $campaigns = Campaign::where('id', $id)->get();

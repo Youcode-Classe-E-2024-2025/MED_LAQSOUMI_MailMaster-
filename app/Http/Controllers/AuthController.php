@@ -22,7 +22,7 @@ use Illuminate\Http\JsonResponse;
  *
  * @OA\Tag(
  *     name="auth",
- *     description="Authentication operations"
+ *     description="Authentication"
  * )
  */
 class AuthController extends Controller
